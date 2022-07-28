@@ -25,7 +25,7 @@ const getUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const { id } = req.params;
     const usuario = yield usuario_1.default.findByPk(id);
     if (!usuario) {
-        res.status(404).json({
+        return res.status(404).json({
             msg: `No existe usuario con id ${id}`
         });
     }
@@ -35,30 +35,77 @@ const getUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
 });
 exports.getUsuario = getUsuario;
-const postUsuario = (req, res) => {
+const postUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
+    try {
+        const existeEmail = yield usuario_1.default.findOne({
+            where: {
+                email: body.email
+            }
+        });
+        if (existeEmail) {
+            return res.status(400).json({
+                msg: 'Ya existe un usuario con ese email'
+            });
+        }
+        const usuario = yield usuario_1.default.create(body);
+        // await usuario.save();
+        res.json({
+            msg: "Usuario creado con éxito",
+            usuario
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: "Error. Hable con el administrador"
+        });
+    }
     res.json({
         msg: 'postUsuarios',
         body
     });
-};
+});
 exports.postUsuario = postUsuario;
-const putUsuario = (req, res) => {
+const putUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { body } = req;
+    try {
+        const usuario = yield usuario_1.default.findByPk(id);
+        if (!usuario) {
+            return res.status(404).json({
+                msg: 'No existe usuario con ese email'
+            });
+        }
+        yield usuario.update(body);
+        res.json(usuario);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: "Error. Hable con el administrador"
+        });
+    }
     res.json({
         msg: 'putUsuarios',
         body,
         id
     });
-};
+});
 exports.putUsuario = putUsuario;
-const deleteUsuario = (req, res) => {
+const deleteUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
+    const usuario = yield usuario_1.default.findByPk(id);
+    if (!usuario) {
+        return res.status(404).json({
+            msg: `No existe usuario con id ${id}`
+        });
+    }
+    yield usuario.update({ estado: false });
     res.json({
         msg: 'deleteUsuarios',
-        id
+        usuario
     });
-};
+});
 exports.deleteUsuario = deleteUsuario;
 //# sourceMappingURL=usuario.js.map

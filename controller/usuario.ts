@@ -16,7 +16,7 @@ export const getUsuario = async (req: Request, res: Response) => {
     const usuario = await Usuario.findByPk(id);
 
     if( !usuario ){
-        res.status(404).json({
+        return res.status(404).json({
             msg: `No existe usuario con id ${id}`
         })
     }
@@ -98,12 +98,22 @@ export const putUsuario = async (req: Request, res: Response) => {
     })
 }
 
-export const deleteUsuario = (req: Request, res: Response) => {
+export const deleteUsuario = async (req: Request, res: Response) => {
     const { id } = req.params;
+
+    const usuario = await Usuario.findByPk(id);
+
+    if( !usuario ){
+        return res.status(404).json({
+            msg: `No existe usuario con id ${id}`
+        })
+    }
+
+    await usuario.update({estado : false});
 
     res.json({
         msg: 'deleteUsuarios',
-        id
+        usuario
     })
 }
 
